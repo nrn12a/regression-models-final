@@ -31,6 +31,9 @@ hist(Rank)
 # make new variable for total salary
 combinedsalary <- Sal94 + Sal95
 suit <- cbind(suit, combinedsalary)
+suit <- cbind(suit, logcombined)
+suit <- cbind(suit, logexper)
+View(suit)
 
 hist(combinedsalary)
 # maybe transform combined
@@ -52,6 +55,7 @@ hist(combinedsalary)
 
 logcombined <- log(combinedsalary)
 hist(logcombined)
+plot(logcombined)
 
 transfit <- lm(logcombined ~ Dept + Gender + Clin + Cert + Prate + logexper +
                  Rank)
@@ -78,7 +82,7 @@ plot(logexper, logcombined)
 hist(Exper)
 # skewed
 
-plot(log_exper, combinedsalary)
+plot(logexper, combinedsalary)
 
 # more normal
 # a lot more of dept 5
@@ -87,14 +91,14 @@ hist(Prate)
 # not completely normal, but not obviously skewed in any direction
 boxplot(Rank)
 
-# first look at regression
+# first look at regression, don't use because of skew
 first <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
             + Gender + Dept)
 summary(first)
 
 
 # automatic procedures
-automatic <- step(first, direction='backward')
+automatic <- step(transfit, direction='backward')
 
 summary(automatic)
 
@@ -102,69 +106,80 @@ AIC(automatic)
 
 # gender does matter, department plays a huge role, so stratify by that
 # by department
-biochemreg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+biochemreg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
                  + Gender, data=biochem)
 summary(biochemreg)
 bioauto <- step(biochemreg, direction = 'backward')
 summary(bioauto)
+AIC(biochemreg)
+AIC(bioauto)
 
-# rank, exper, cert, clin
-# not significant for biochem
+# rank, logexper, cert, clin
+# G not significant for biochem
 
-physioreg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+physioreg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
                 + Gender, data=physiology)
 summary(physioreg)
 physioauto <- step(physioreg, direction = 'backward')
 summary(physioauto)
+AIC(physioreg)
+AIC(physioauto)
 
-# rank, exper, cert, clin
+# rank, logexper, cert, clin
 
 # not significant for physiology
 
 
-genereg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+genereg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
               + Gender, data=genetics)
 summary(genereg)
 
 geneauto <- step(genereg, direction = 'backward')
 summary(geneauto)
-
+AIC(genereg)
+AIC(geneauto)
 # just rank, prate, cert!!
 # clin NS for genetics
 
 
 # not significant for genetics
 
-pedreg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+pedreg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
              + Gender, data=pediatrics)
 summary(pedreg)
 
 pedauto <- step(pedreg, direction = 'backward')
 summary(pedauto)
+AIC(pedreg)
+AIC(pedauto)
 
-# rank, exper, prate, cert
+# rank, logexper, prate, cert
 # clinical not sig for peds
 
 # NS for peds
 
-medreg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+medreg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
              + Gender, data=medicine)
 summary(medreg)
 
 medauto <- step(medreg, direction = 'backward')
 summary(medauto)
+AIC(medreg)
+AIC(medauto)
 
-# rank, exper, cert, clin
+# rank, logexper, clin
 #NS for medicine
 
-surgreg <- lm(combinedsalary ~ Rank + Exper + Prate + Cert + Clin
+surgreg <- lm(logcombined ~ Rank + logexper + Prate + Cert + Clin
               + Gender, data=surgery)
 summary(surgreg)
 
 surgauto <- step(surgreg, direction = 'backward')
 summary(surgauto)
+AIC(surgreg)
+AIC(surgauto)
 
-#rank, exper, cert, clin
+#rank, logexper, cert, clin
 #NS for surgery
 
 
@@ -279,5 +294,4 @@ print(mse)
 cvfit <- glmnet::cv.glmnet(X, Y)
 coef(cvfit, s = best.lambda)
 best.lambda
-
 
