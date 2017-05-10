@@ -31,12 +31,16 @@ hist(Rank)
 # make new variable for total salary
 combinedsalary <- Sal94 + Sal95
 suit <- cbind(suit, combinedsalary)
+logcombined <- log(combinedsalary)
 suit <- cbind(suit, logcombined)
+logexper <- log(Exper)
 suit <- cbind(suit, logexper)
 View(suit)
 
 hist(combinedsalary)
 # maybe transform combined
+
+par(mfrow=c(1,1))
 
 logexper <- log(Exper)
 hist(logexper)
@@ -55,6 +59,10 @@ logexperhist <- ggplot(suit, aes(x=logexper)) +
   geom_density(alpha = .2, fill="#FF6666")
 logexperhist + labs(x = "Log Transformation of Experience",
                     title = "Distribution of Log Transformation")
+
+qqnorm(combinedsalary, main = 'Combined Salary Q-Q Plot'); qqline(combinedsalary); 
+
+qqnorm(logcombined, main = 'Log Transformtion of Salary Q-Q Plot'); qqline(logcombined)
 
 
 
@@ -167,6 +175,16 @@ assistantfit <- lm(logcombined ~ Gender + Clin + Prate + logexper +
 
 summary(assistantfit)
 
+assistantautomatic <- step(assistantfit, direction='backward')
+
+summary(assistantautomatic)
+
+AIC(assistantautomatic)
+
+sum(assistant$Gender)
+sum(associate$Gender)
+sum(fullprof$Gender)
+
 # Gender is significant!!
 
 associate <- subset(suit, Rank == '2')
@@ -175,6 +193,19 @@ associatefit <- lm(logcombined ~ Gender + Clin + Prate + logexper +
                      Cert, data=associate)
 
 summary(associatefit)
+
+### huge part of my results
+
+# test logistic regression model between Rank and Gender!!!
+library(MASS)
+# i'm making assistant the outcome
+dummyrank <- ifelse(Rank == '2' | Rank == '3', 0, 1)
+dummyrank <- as.factor(dummyrank)
+logreg <- glm(dummyrank ~ Gender + Clin + Cert + Prate + Exper + Dept, family = "binomial")
+coef(summary(logreg))
+
+# gender p-value = .002997
+# OR estimate for males to be an assistant professor: 0.3197
 
 # G NS
 
@@ -407,4 +438,6 @@ print(mse)
 cvfit <- glmnet::cv.glmnet(X, Y)
 coef(cvfit, s = best.lambda)
 best.lambda
+
+
 
