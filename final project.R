@@ -41,6 +41,39 @@ hist(combinedsalary)
 logexper <- log(Exper)
 hist(logexper)
 
+experhist <- ggplot(suit, aes(x=Exper)) + 
+  geom_histogram(aes(y = ..density..),
+                 binwidth=.5,
+                 colour="black", fill="light blue") +
+  geom_density(alpha = .2, fill="#FF6666")
+experhist + labs(x = "Experience", title = "Distribution of Experience")
+
+logexperhist <- ggplot(suit, aes(x=logexper)) + 
+  geom_histogram(aes(y = ..density..),
+                 binwidth=.5,
+                 colour="black", fill="white") +
+  geom_density(alpha = .2, fill="#FF6666")
+logexperhist + labs(x = "Log Transformation of Experience",
+                    title = "Distribution of Log Transformation")
+
+
+
+
+salaryhist <- ggplot(suit, aes(x=combinedsalary)) + 
+  geom_histogram(aes(y = ..density..),
+                 binwidth=.5,
+                 colour="black", fill="light blue") +
+  geom_density(alpha = .2, fill="#FF6666")
+salaryhist + labs(x = "Combined Salary", title = "Distribution of Combined Salary")
+
+logsalhist <- ggplot(suit, aes(x=logcombined)) + 
+  geom_histogram(aes(y = ..density..),
+                 binwidth=.5,
+                 colour="black", fill="white") +
+  geom_density(alpha = .2, fill="#FF6666")
+logsalhist + labs(x = "Log Transformation of Combined Salary",
+                    title = "Distribution of Log Transformation")
+
 names(suit)
 # that's better
 
