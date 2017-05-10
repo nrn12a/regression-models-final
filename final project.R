@@ -108,6 +108,86 @@ medicine <- subset(suit, Dept == '5')
 surgery <- subset(suit, Dept == '6')
 
 
+# do stuff for different groups
+
+clinical <- subset(suit, Clin == '1')
+clinreg <- lm(logcombined ~ Rank + logexper + Prate + Cert
+                 + Gender, data=clinical)
+summary(clinreg)
+clinauto <- step(clinreg, direction = 'backward')
+summary(clinauto)
+
+# G NS
+
+
+
+research <- subset(suit, Clin == '0')
+
+researchreg <- lm(logcombined ~ Rank + logexper + Prate
+              + Gender, data=research)
+summary(researchreg)
+
+# G NS
+
+
+certified <- subset(suit, Cert == '1')
+
+certfit <- lm(logcombined ~ + Gender + Clin + Prate + logexper +
+                 Rank, data=certified)
+
+summary(certfit)
+
+# G NS
+
+mean(combinedsalary[Dept== '1'])
+mean(combinedsalary[Dept== '2'])
+mean(combinedsalary[Dept== '3'])
+mean(combinedsalary[Dept== '4'])
+mean(combinedsalary[Dept== '5'])
+mean(combinedsalary[Dept== '6'])
+
+
+# surgery is about twice as high as everything else, males = 35/40
+
+
+uncertified <- subset(suit, Cert == '0')
+
+uncertfit <- lm(logcombined ~ + Gender + Clin + Prate + logexper +
+                Rank, data=uncertified)
+
+summary(uncertfit)
+
+# G NS
+
+assistant <- subset(suit, Rank == '1')
+
+
+assistantfit <- lm(logcombined ~ Gender + Clin + Prate + logexper +
+                Cert, data=assistant)
+
+summary(assistantfit)
+
+# Gender is significant!!
+
+associate <- subset(suit, Rank == '2')
+
+associatefit <- lm(logcombined ~ Gender + Clin + Prate + logexper +
+                     Cert, data=associate)
+
+summary(associatefit)
+
+# G NS
+
+fullprof <- subset(suit, Rank == '3')
+
+fullproffit <- lm(logcombined ~ Gender + Clin + Prate + logexper +
+                     Cert, data=fullprof)
+
+summary(fullproffit)
+
+# G NS
+
+
 plot(Prate, combinedsalary)
 abline(lm(combinedsalary ~ Prate))
 
