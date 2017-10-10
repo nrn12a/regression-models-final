@@ -1,0 +1,64 @@
+# GLM hw3, Nathan Neill
+
+rm(list=ls())
+
+# question 1
+# load endocancer
+endocancer <- read.table('EndoCancer.txt', header = T)
+attach(endocancer)
+detach(endocancer)
+
+# 1.a
+sum(endocancer$Gall == 1)
+# 15 pairs
+
+# 1.b
+sum(endocancer$Gall == 0) / 2
+# 48 pairs
+
+
+# 1.c
+bothgall <- subset(endocancer, Gall == 1)
+
+n_occurboth <- data.frame(table(bothgall$ID))
+
+n_occurboth[n_occurboth$Freq > 1,]
+
+# 4 pairs 
+
+# now for both not gall
+
+nogall <- subset(endocancer, Gall == 0)
+
+n_occurnogall <- data.frame(table(nogall$ID))
+
+n_occurnogall[n_occurnogall$Freq > 1,]
+
+
+
+
+# problem 2
+library(survival)
+asp <- read.table('AspCancer.txt', header = T)
+
+
+asp1.clogit <- clogit(Cancer ~ Drinking, data=asp)
+summary(asp1.clogit)
+
+# 2b
+asp2.clogit <- clogit(Cancer ~ Drinking + Exposure, data=asp)
+summary(asp2.clogit)
+
+# 2c
+asp3.clogit <- clogit(Cancer ~ Drinking + Exposure + Smoking, data=asp)
+summary(asp3.clogit)
+
+# LRT
+anova(asp1.clogit, asp3.clogit)
+anova(asp3.clogit, asp1.clogit)
+
+pchisq(1.4893, df=2, lower.tail=FALSE)
+
+
+
+# problem 3
