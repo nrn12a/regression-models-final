@@ -1,0 +1,96 @@
+# Nathan Neill, UNI: nn2401
+# GLM Homework 4
+rm(list=ls())
+install.packages("Sleuth3")
+library(Sleuth3)
+
+# Problem 2
+moths <- data("case2102")
+summary(moths)
+attach(case2102)
+summary(case2102)
+library(boot)
+
+# create proportion removed
+case2102$prop <- case2102$Removed/case2102$Placed
+# create logit
+case2102$logitprop <- logit(case2102$prop)
+summary(case2102)
+
+# part a
+lightmoths <- subset(case2102, Morph == "light")
+lightmoths
+
+plot(lightmoths$Distance, lightmoths$logitprop,
+     xlab="Distance from Liverpool in km", ylab="Logit of the Proportion
+     of Light Moths Removed")
+
+library(plotly)
+
+p <- plot_ly(lightmoths, x = ~Distance, y = ~logitprop,
+             type='scatter', mode='lines') %>% layout(title="Problem 2a Plot",
+               xaxis=list(title = "Distance from Liverpool in km"),
+                                                      yaxis=list(title="Logit of the Proportion
+     of Light Moths Removed"))
+
+p
+
+
+mothreg <- glm(prop ~ Distance, family=binomial,
+    data=case2102)
+
+summary(mothreg)
+
+detach(case2102)
+
+
+
+# Problem 5
+# load data
+atom = ex2220
+
+atom$Rate = atom$Deaths / atom$AtRisk
+
+firstfive = glm(Deaths ~ YearsAfter + Exposure + I(Exposure^2) + offset(log(AtRisk)),
+            data=atom, family=poisson)
+summary(firstfive)
+anova(firstfive, test="Chi")
+firstfive$deviance
+mean(atom$Deaths)
+
+# another way to test
+install.packages("qcc")
+library(qcc)
+
+qcc.overdispersion.test(atom$Deaths, type = "poisson")
+# gives same result
+
+# part b
+secondfivea = glm(Deaths ~ YearsAfter + Exposure + offset(log(AtRisk)),
+                 data=atom, family=poisson)
+levels(atom$YearsAfter) = as.character(c(3.5, 9.5, 13.5, 17.5, 21.5, 25.5, 29.5))
+summary(secondfivea)
+atom$YearsAfter = as.numeric(as.character(atom$YearsAfter))
+secondfiveb = glm(Deaths ~ log(YearsAfter) + Exposure + offset(log(AtRisk)),
+                  data=atom, family=poisson)
+
+summary(secondfiveb)
+
+# compare the two
+anova(secondfivea)
+anova(firstfive)
+anova(secondfiveb)
+
+secondfivea$deviance
+secondfiveb$deviance
+
+
+# part c
+fivec = glm(Deaths ~ YearsAfter + Exposure + I(log(YearsAfter)*Exposure)
+            + offset(log(AtRisk)),
+            data=atom, family=poisson)
+summary(fivec)
+
+# part d
+secondfiveb$coefficients
+confint(secondfiveb)
