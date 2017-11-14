@@ -4,6 +4,10 @@ rm(list=ls())
 install.packages("Sleuth3")
 library(Sleuth3)
 
+
+# problem 1
+# group by individual, each individual has 2 of their own trials? 
+
 # Problem 2
 moths <- data("case2102")
 summary(moths)
@@ -35,15 +39,84 @@ p <- plot_ly(lightmoths, x = ~Distance, y = ~logitprop,
 
 p
 
+# part b
 
 mothreg <- glm(prop ~ Distance, family=binomial,
     data=case2102)
 
 summary(mothreg)
 
+# do white removed over all removed, not placed
+# .280, -.018
+# p= .839
+moth2 <- glm(cbind(Removed, Placed) ~ Distance, family=binomial,
+             data=case2102)
+
+summary(moth2)
+
+# c, find deviance goodness of fit statistic, CIs
+pchisq(deviance(moth2),
+       df.residual(moth2), lower.tail=F)
+
+
 detach(case2102)
 
+# problem 3
+# part a
+# .4269
+# .095, .763
 
+
+
+# problem 4
+aflo = ex2116
+
+aflomodel <- glm(cbind(Tumor, (Total - Tumor)) ~ Dose, data=aflo,
+                 family = quasibinomial())
+
+summary(aflomodel)
+
+plot(aflo$Tumor, dev.resid, xlab="Tumor", 
+     ylab="Deviance Residuals")
+
+what <- plot(fitted(aflomodel),cooks.distance(aflomodel), xlab="Fitted Damage Incidents",
+     ylab="Cooks distance")
+
+what
+plot(fitted(aflomodel),hatvalues(aflomodel), xlab="Fitted Damage Incidents",
+     ylab="Leverage")
+plot(fitted(ships.glm),dffits(ships.glm), xlab="Fitted Damage Incidents",
+     ylab="DFFITS")
+
+# only 18 as influential point
+# use F test for quasi, p=6.48^-5
+
+# part d
+anova(aflomodel, test="F")
+
+# part e, .0604
+
+# f confidence interval
+quad <- function(a,b,d) {
+  disc <- sqrt(b^2 -4*a*d)
+  c((-b-disc)/(2*a), (-b+disc)/(2*a))
+}
+
+fieller <- function(coefest, varest, conflevel=0.95) {
+  alpha <- (1-conflevel) / 2
+  critval <- qnorm(alpha, lower.tail=F)
+  a <- coefest[2]^2 - critval^2*varest[2,2]
+  b <- -(2*varest[1,2]*critval^2-2*prod(coefest))
+  d <- coefest[1]^2-critval^2*varest[1,1]
+  quad(a,b,d)
+}
+
+fieller(coef(aflomodel), vcov(aflomodel))
+
+# 4g
+deviance(aflomodel)
+pchisq(deviance(aflomodel),
+       df.residual(aflomodel), lower.tail=F)
 
 # Problem 5
 # load data
@@ -64,6 +137,7 @@ library(qcc)
 
 qcc.overdispersion.test(atom$Deaths, type = "poisson")
 # gives same result
+ggplot(atom, x=fitted(firstfive), y=resid(firstfive))
 
 # part b
 secondfivea = glm(Deaths ~ YearsAfter + Exposure + offset(log(AtRisk)),
@@ -94,3 +168,4 @@ summary(fivec)
 # part d
 secondfiveb$coefficients
 confint(secondfiveb)
+
