@@ -127,7 +127,7 @@ atom$Rate = atom$Deaths / atom$AtRisk
 firstfive = glm(Deaths ~ YearsAfter + Exposure + I(Exposure^2) + offset(log(AtRisk)),
             data=atom, family=poisson)
 summary(firstfive)
-anova(firstfive, test="Chi")
+anova(firstfive, test="LRT")
 firstfive$deviance
 mean(atom$Deaths)
 
@@ -168,4 +168,26 @@ summary(fivec)
 # part d
 secondfiveb$coefficients
 confint(secondfiveb)
+
+
+# problem 6
+library(MASS)
+water = ex2224
+water$Mode <- as.factor(water$Mode)
+water$Valve <- as.factor(water$Valve)
+water$Operator <- as.factor(water$Operator)
+water$System <- as.factor(water$System)
+
+
+waterpois <- glm(Failures ~ Mode + Size + Valve + Operator + System + 
+                   offset(log(Time)), data=water, family=negative.binomial())
+
+waterpois <- glm(Failures ~ Mode*Size*Valve*Operator*System*offset(log(Time)), data=water, family=poisson)
+summary(waterpois)
+
+water.nb <- glm.nb(Failures ~ Mode + Size + Valve + Operator + System,
+                   data = water, offset(log(Time)))
+water.nb$theta
+water.nb$SE
+summary(water.nb)
 
