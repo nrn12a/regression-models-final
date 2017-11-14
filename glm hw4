@@ -65,7 +65,15 @@ detach(case2102)
 # part a
 # .4269
 # .095, .763
+group3 <- c(1,2)
+colds <- c(335, 302)
+size3 <- c(411, 407)
+indicator3 <- c(1,0)
+threeset <- as.data.frame(cbind(group3, colds, size3, indicator3))
 
+coldreg <- glm(cbind(colds, size3-colds) ~ indicator3, data=threeset,
+               family = binomial)
+summary(coldreg)
 
 
 # problem 4
@@ -76,8 +84,7 @@ aflomodel <- glm(cbind(Tumor, (Total - Tumor)) ~ Dose, data=aflo,
 
 summary(aflomodel)
 
-plot(aflo$Tumor, dev.resid, xlab="Tumor", 
-     ylab="Deviance Residuals")
+plot(aflomodel)
 
 what <- plot(fitted(aflomodel),cooks.distance(aflomodel), xlab="Fitted Damage Incidents",
      ylab="Cooks distance")
@@ -172,11 +179,14 @@ confint(secondfiveb)
 
 # problem 6
 library(MASS)
+install.packages("pscl")
+library(pscl)
 water = ex2224
 water$Mode <- as.factor(water$Mode)
 water$Valve <- as.factor(water$Valve)
 water$Operator <- as.factor(water$Operator)
 water$System <- as.factor(water$System)
+water$Size <- as.factor(water$Size)
 
 
 waterpois <- glm(Failures ~ Mode + Size + Valve + Operator + System + 
@@ -190,4 +200,18 @@ water.nb <- glm.nb(Failures ~ Mode + Size + Valve + Operator + System,
 water.nb$theta
 water.nb$SE
 summary(water.nb)
+
+
+# zero inflated model
+
+zero1 <- zeroinfl(Failures ~ Mode + Size + Valve + Operator + System | 1,
+                  offset=log(Time), data = water, dist = "negbin")
+summary(zero1)
+
+vuong(zero1, water.nb)
+
+# zero inflated isn't significantly better than regular negative binomial
+
+# AIC
+stepAIC(water.nb, direction = "both")
 
