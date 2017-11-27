@@ -1,0 +1,31 @@
+# Nathan Neill, UNI: nn2401
+# GLM Homework 5 R code
+
+# Problem 1, parasite data
+rm(list=ls())
+parasite <- read.table("parasite.txt", header=T)
+summary(parasite)
+parasite$Area <- factor(parasite$Area)
+parasite$Year <- factor(parasite$Year)
+
+library(MASS)
+
+# fit a Poisson model with log link
+# area, year, length as predictors
+poisson_parasite <- glm(Intensity ~ Area + Length + Year,
+                        data=parasite, family=poisson())
+summary(poisson_parasite)
+
+plot(fitted(poisson_parasite), dev.resid, xlab="Fitted Intensity", 
+     ylab="Deviance Residuals")
+plot(poisson_parasite$grass, dev.resid, xlab="Grass Cover", 
+     ylab="Deviance Residuals")
+plot(poisson_parasite$soil, dev.resid, xlab="Soil", 
+     ylab="Deviance Residuals")
+
+plot(fitted(poisson_parasite), pear.resid, xlab="Fitted Intensity", 
+     ylab="Pearson Residuals")
+plot(poisson_parasite$grass, pear.resid, xlab="Grass Cover", 
+     ylab="Pearson Residuals")
+plot(poisson_parasite$soil, pear.resid, xlab="Soil", 
+     ylab="Pearson Residuals")
