@@ -61,6 +61,7 @@ prob2
 
 
 
+
 # Problem 3
 type <- rep(c("collision","rollover"),each=8)
 weight <- rep(rep(c("small","standard"),each=4), times=2)
@@ -75,4 +76,19 @@ three.full <- glm(n ~ type*weight*ejected*severity,
                   family=poisson(), data=prob3)
 summary(three.full)
 anova(three.full, test="Chisq")
+
+
+# models of uniform order
+threeorder1 <- glm(n ~ type + weight + ejected + severity, family=poisson(), data=prob3)
+summary(threeorder1)
+
+threeorder2 <- glm(n ~ (type + weight + ejected + severity)^2, family=poisson(), data=prob3)
+summary(threeorder2)
+
+threeorder3 <- glm(n ~ (type + weight + ejected + severity)^3, family=poisson(), data=prob3)
+summary(threeorder3)
+
+threeorder4 <- glm(n ~ (type + weight + ejected + severity)^4, family=poisson(), data=prob3)
+summary(threeorder4)
+
 
