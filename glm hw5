@@ -8,6 +8,9 @@ summary(parasite)
 parasite$Area <- factor(parasite$Area)
 parasite$Year <- factor(parasite$Year)
 
+# get rid of null values
+parasite <- subset(parasite, !is.na(Intensity))
+
 library(MASS)
 
 # fit a Poisson model with log link
@@ -45,4 +48,15 @@ parasite0 <- zeroinfl(Intensity ~ Area + Length + Year,
 summary(parasite0)
 
 vuong(parasite0, poisson_parasite)
+
+
+
+# Problem 2
+dose <- rep(c("Low","High"), each=4)
+cancer <- rep(rep(c("Present", "Absent"),each=2), times=2)
+age <- rep(c("lessthan131","sacrificed"),times=4)
+n <- c(4,0,26,14,7,7,16,14)
+prob2 <- data.frame(n=n, dose=dose, cancer=cancer, age=age)
+prob2
+
 
