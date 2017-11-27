@@ -60,3 +60,19 @@ prob2 <- data.frame(n=n, dose=dose, cancer=cancer, age=age)
 prob2
 
 
+
+# Problem 3
+type <- rep(c("collision","rollover"),each=8)
+weight <- rep(rep(c("small","standard"),each=4), times=2)
+ejected <- rep(rep(c("no","yes"),each=2), times=4)
+severity <- rep(c("notsevere","severe"),time=8)
+n <- c(350, 150, 26, 23, 1878, 1022, 111, 161, 60, 112, 19, 80, 148, 404, 22, 265)
+prob3 <- data.frame(n=n, type=type, weight=weight, ejected=ejected, severity=severity)
+prob3
+
+# first attempt at saturated
+three.full <- glm(n ~ type*weight*ejected*severity, 
+                  family=poisson(), data=prob3)
+summary(three.full)
+anova(three.full, test="Chisq")
+
