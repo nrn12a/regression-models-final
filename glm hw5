@@ -16,16 +16,33 @@ poisson_parasite <- glm(Intensity ~ Area + Length + Year,
                         data=parasite, family=poisson())
 summary(poisson_parasite)
 
-plot(fitted(poisson_parasite), dev.resid, xlab="Fitted Intensity", 
-     ylab="Deviance Residuals")
-plot(poisson_parasite$grass, dev.resid, xlab="Grass Cover", 
-     ylab="Deviance Residuals")
-plot(poisson_parasite$soil, dev.resid, xlab="Soil", 
+dev.resid.parasite <- resid(poisson_parasite)
+pear.resid.parasite <- resid(poisson_parasite, type="pearson")
+
+
+# plot residuals
+plot(fitted(poisson_parasite), dev.resid.parasite, xlab="Fitted Intensity", 
      ylab="Deviance Residuals")
 
-plot(fitted(poisson_parasite), pear.resid, xlab="Fitted Intensity", 
+
+plot(fitted(poisson_parasite), pear.resid.parasite, xlab="Fitted Intensity", 
      ylab="Pearson Residuals")
-plot(poisson_parasite$grass, pear.resid, xlab="Grass Cover", 
-     ylab="Pearson Residuals")
-plot(poisson_parasite$soil, pear.resid, xlab="Soil", 
-     ylab="Pearson Residuals")
+
+# test goodness of fit, 1c
+pchisq(deviance(poisson_parasite), df.residual(poisson_parasite),
+       lower.tail=F)
+
+pchisq(sum(pear.resid.parasite^2), df.residual(poisson_parasite),
+       lower.tail=F)
+anova(poisson_parasite, test="Chisq")
+
+
+# build a zero inflated model
+library(pscl)
+parasite0 <- zeroinfl(Intensity ~ Area + Length + Year,
+                      data=parasite, dist = "poisson")
+
+summary(parasite0)
+
+vuong(parasite0, poisson_parasite)
+
