@@ -166,20 +166,36 @@ anova(three.full, test="Chisq")
 threeorder1 <- glm(n ~ type + weight + ejected + severity, family=poisson(), data=prob3)
 summary(threeorder1)
 
+pchisq(deviance(threeorder1), df.residual(threeorder1), lower.tail=F)
+
+# 1 doesn't fit
+
 threeorder2 <- glm(n ~ (type + weight + ejected + severity)^2, family=poisson(), data=prob3)
 summary(threeorder2)
+
+pchisq(deviance(threeorder2), df.residual(threeorder2), lower.tail=F)
+
+# 2 does fit
 
 threeorder3 <- glm(n ~ (type + weight + ejected + severity)^3, family=poisson(), data=prob3)
 summary(threeorder3)
 
+pchisq(deviance(threeorder3), df.residual(threeorder3), lower.tail=F)
+
+# 3 does fit
+
 threeorder4 <- glm(n ~ (type + weight + ejected + severity)^4, family=poisson(), data=prob3)
 summary(threeorder4)
+
+pchisq(deviance(threeorder4), df.residual(threeorder4), lower.tail=F)
+
+# 4 doesn't fit
 
 # compare the models
 anova(threeorder1, threeorder2, test="Chisq")
 anova(threeorder2, threeorder3, test="Chisq")
+anova(threeorder3, threeorder4, test="Chisq")
 anova(threeorder2, threeorder4, test="Chisq")
-
 
 
 
