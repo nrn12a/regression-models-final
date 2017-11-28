@@ -66,20 +66,84 @@ prob2
 prob2.ab.c <- glm(n ~ dose*age + cancer, family=poisson(), data=prob2)
 summary(prob2.ab.c)
 
+dev.resid.i <- resid(prob2.ab.c)
+pear.resid.i <- resid(prob2.ab.c, type="pearson")
+
+pchisq(deviance(prob2.ab.c), df.residual(prob2.ab.c),
+       lower.tail=F)
+
+pchisq(sum(pear.resid.i^2), df.residual(prob2.ab.c),
+       lower.tail=F)
+
+
 # ii. (CA, BA)
 prob2.ca.ba <- glm(n ~ cancer*dose + age*dose,
                    family=poisson(), data=prob2)
 summary(prob2.ca.ba)
+
+dev.resid.ii <- resid(prob2.ca.ba)
+pear.resid.ii <- resid(prob2.ca.ba, type="pearson")
+
+pchisq(deviance(prob2.ca.ba), df.residual(prob2.ca.ba),
+       lower.tail=F)
+
+pchisq(sum(pear.resid.ii^2), df.residual(prob2.ca.ba),
+       lower.tail=F)
 
 # iii. (CB, AB)
 prob2.cb.ab <- glm(n ~ cancer*age + dose*age,
                    family=poisson(), data=prob2)
 summary(prob2.cb.ab)
 
+dev.resid.iii <- resid(prob2.cb.ab)
+pear.resid.iii <- resid(prob2.cb.ab, type="pearson")
+
+pchisq(deviance(prob2.cb.ab), df.residual(prob2.cb.ab),
+       lower.tail=F)
+
+pchisq(sum(pear.resid.iii^2), df.residual(prob2.cb.ab),
+       lower.tail=F)
+
+
+
 # iv. (AB, BC, AC)
 prob2.ab.bc.ac <- glm(n ~ dose*age + dose*cancer + age*cancer,
                       family=poisson(), data=prob2)
 summary(prob2.ab.bc.ac)
+
+dev.resid.iv <- resid(prob2.ab.bc.ac)
+pear.resid.iv <- resid(prob2.ab.bc.ac, type="pearson")
+
+pchisq(deviance(prob2.ab.bc.ac), df.residual(prob2.ab.bc.ac),
+       lower.tail=F)
+
+pchisq(sum(pear.resid.iv^2), df.residual(prob2.ab.bc.ac),
+       lower.tail=F)
+
+
+df <- c(df.residual(prob2.ab.c),
+        df.residual(prob2.ca.ba),
+        df.residual(prob2.cb.ab),
+        df.residual(prob2.ab.bc.ac))
+
+x2pear <- c(sum(resid(prob2.ab.c,type='pearson')^2),
+            sum(resid(prob2.ca.ba,type='pearson')^2),
+            sum(resid(prob2.cb.ab,type='pearson')^2),
+            sum(resid(prob2.ab.bc.ac,type='pearson')^2))
+
+x2pear
+
+x2 <- c(deviance(prob2.ab.c),
+              deviance(prob2.ca.ba),
+              deviance(prob2.cb.ab),
+              deviance(prob2.ab.bc.ac))
+
+print(cbind(df,x2pear,x2, pchisq(x2,df,lower.tail=F))[1:4,],digits=2)
+
+
+
+# drop in deviance test
+anova(prob2.ab.c, prob2.cb.ab, test="Chisq")
 
 
 # Problem 3
@@ -115,6 +179,7 @@ summary(threeorder4)
 anova(threeorder1, threeorder2, test="Chisq")
 anova(threeorder2, threeorder3, test="Chisq")
 anova(threeorder2, threeorder4, test="Chisq")
+
 
 
 
