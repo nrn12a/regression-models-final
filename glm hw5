@@ -49,6 +49,8 @@ summary(parasite0)
 
 vuong(parasite0, poisson_parasite)
 
+pchisq(2 * (poisson_parasite$loglik - parasite0$loglik), df = parasite0$df.residual - poisson_parasite$df.residual, lower.tail=FALSE)
+
 
 
 # Problem 2
@@ -58,6 +60,9 @@ age <- rep(c("lessthan131","sacrificed"),times=4)
 n <- c(4,0,26,14,7,7,16,14)
 prob2 <- data.frame(n=n, dose=dose, cancer=cancer, age=age)
 prob2
+
+
+
 
 # fit models
 # A = dose, B = age, C = cancer
@@ -140,10 +145,26 @@ x2 <- c(deviance(prob2.ab.c),
 
 print(cbind(df,x2pear,x2, pchisq(x2,df,lower.tail=F))[1:4,],digits=2)
 
+# predict
+exp(predict())
+
 
 
 # drop in deviance test
 anova(prob2.ab.c, prob2.cb.ab, test="Chisq")
+
+
+# 2d
+cancer1 <- rep(rep(c("Present", "Absent"),each=2), times=1)
+age1 <- rep(c("lessthan131","sacrificed"),times=2)
+n2 <- c(11,7,42,28)
+try2 <- data.frame(n=n2, cancer=cancer1, age=age1)
+try2
+
+
+d2 <- glm(n ~ cancer*age, family=poisson(), data=try2)
+summary(d2)
+anova(d2, test="Chisq")
 
 
 # Problem 3
