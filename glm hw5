@@ -59,7 +59,27 @@ n <- c(4,0,26,14,7,7,16,14)
 prob2 <- data.frame(n=n, dose=dose, cancer=cancer, age=age)
 prob2
 
+# fit models
+# A = dose, B = age, C = cancer
 
+# i. (AB, C)
+prob2.ab.c <- glm(n ~ dose*age + cancer, family=poisson(), data=prob2)
+summary(prob2.ab.c)
+
+# ii. (CA, BA)
+prob2.ca.ba <- glm(n ~ cancer*dose + age*dose,
+                   family=poisson(), data=prob2)
+summary(prob2.ca.ba)
+
+# iii. (CB, AB)
+prob2.cb.ab <- glm(n ~ cancer*age + dose*age,
+                   family=poisson(), data=prob2)
+summary(prob2.cb.ab)
+
+# iv. (AB, BC, AC)
+prob2.ab.bc.ac <- glm(n ~ dose*age + dose*cancer + age*cancer,
+                      family=poisson(), data=prob2)
+summary(prob2.ab.bc.ac)
 
 
 # Problem 3
@@ -90,5 +110,11 @@ summary(threeorder3)
 
 threeorder4 <- glm(n ~ (type + weight + ejected + severity)^4, family=poisson(), data=prob3)
 summary(threeorder4)
+
+# compare the models
+anova(threeorder1, threeorder2, test="Chisq")
+anova(threeorder2, threeorder3, test="Chisq")
+anova(threeorder2, threeorder4, test="Chisq")
+
 
 
